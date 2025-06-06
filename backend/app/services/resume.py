@@ -1,5 +1,6 @@
 import os
 from typing import Dict, Optional, Protocol
+from ai.ai_client import IAIClient
 from extractors.docling_extractor import extract_html_from_file
 from models.resume import Resume
 from repositories.resume import IResumeRepository
@@ -39,20 +40,20 @@ class ResumeService(IResumeService):
         self,
         resume_repository: IResumeRepository,
         session: Session,
-        mock_ai_client: str,
+        ai_client: IAIClient,
         upload_dir: str,
         ai_output_dir: str,
     ):
         self.resume_repository = resume_repository
         self.session = session
-        self.mock_ai_client = mock_ai_client
+        self.ai_client = ai_client
         self.upload_dir = upload_dir
         self.ai_output_dir = ai_output_dir
 
     def upload(self, file_path: str, original_filename: str, job_title: str) -> Resume:
         resume = self.__create_initial(original_filename, job_title)
         resume_html = extract_html_from_file(file_path)
-        ai_response = self.mock_ai_client.generate_feedback(resume_html, job_title)
+        ai_response = self.ai_client.generate_feedback(resume_html, job_title)
         ai_response_dict = self.__parse_ai_response(ai_response)
         result_pdf_path = self._make_pdf(ai_response_dict["revised_html"], resume.id)
         resume_new = Resume(
