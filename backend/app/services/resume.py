@@ -2,6 +2,7 @@ import os
 from typing import Dict, Optional, Protocol
 from ai.ai_client import IAIClient
 from extractors.docling_extractor import extract_html_from_file
+from generators.pdf_weasy_generator import generate_pdf
 from models.resume import Resume
 from repositories.resume import IResumeRepository
 from sqlmodel import Session
@@ -34,6 +35,11 @@ class IResumeService(Protocol):
 class ResumeService(IResumeService):
     """
     Concrete implementation of the resume service.
+    @attribute resume_repository: An instance of the resume repository.
+    @attribute session: An instance of the SQLModel session.
+    @attribute ai_client: An instance of the AI client.
+    @attribute upload_dir: The directory to upload the resumes.
+    @attribute ai_output_dir: The directory to save the AI output.
     """
 
     def __init__(
@@ -84,6 +90,6 @@ class ResumeService(IResumeService):
 
     def _make_pdf(self, revised_html: str, resume_id: int) -> str:
         os.makedirs(self.ai_output_dir, exist_ok=True)
-        path = os.path.join(self.ai_output_dir, f"{resume_id}_revised.pdf")
-        #! generate_pdf(revised_html, path)
-        return path
+        output_path = os.path.join(self.ai_output_dir, f"{resume_id}_revised.pdf")
+        generate_pdf(revised_html, output_path)
+        return output_path
