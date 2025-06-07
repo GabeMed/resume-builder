@@ -1,7 +1,7 @@
 from pydantic import BaseSettings
 
 
-class Config(BaseSettings):
+class Settings(BaseSettings):
     DATABASE_URL: str
     OPENAI_API_KEY: str
     UPLOAD_DIR: str = "./TEMP_FILES"
