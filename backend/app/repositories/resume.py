@@ -1,6 +1,6 @@
 from typing import Dict, Protocol, Optional
 from sqlmodel import Session, select
-from app.models.resume import Resume
+from models.resume import Resume
 
 
 class IResumeRepository(Protocol):
@@ -37,6 +37,7 @@ class IResumeRepository(Protocol):
 class ResumeRepository(IResumeRepository):
     """
     Concrete implementation of IResumeRepository using SQLModel / SQLAlchemy.
+    @attribute db: The SQLModel session.
     """
 
     def __init__(self, db: Session):
