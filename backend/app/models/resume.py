@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
@@ -17,7 +17,7 @@ class Resume(SQLModel, table=True):
     """
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
     original_filename: str
     job_title: Optional[str] = None
     resume_html: Optional[str] = None
