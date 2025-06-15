@@ -1,31 +1,21 @@
-import os, shutil, uuid
-from config import Settings
-from dependencies.services import get_resume_service
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from services.resume import IResumeService
+import os
+from app.config import Settings
+from app.dependencies.services import get_resume_service
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from app.services.resume import IResumeService
+from app.utils.file_utils import store_temp_file
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
 
 
-##Todo move this util outside of the routers
-def _store_temp(upload: UploadFile, settings: Settings) -> str:
-    ext = os.path.splitext(upload.filename)[1]
-    dest = os.path.join(settings.UPLOAD_DIR, f"{uuid.uuid4()}{ext}")
-    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-    with open(dest, "wb") as fdst:
-        shutil.copyfileobj(upload.file, fdst)
-    return dest
-
-
-##Todo return the resume object (Need to create the response objects)
 @router.post("", response_model=int)
-async def upload_resume(  ## Uploads the resume to a tempfile, create an object with the temp file information, and then deletes the temp
-    file: UploadFile,
-    job_title: str,
+async def upload_resume(
+    file: UploadFile = File(...),
+    job_title: str = Form(...),
     service: IResumeService = Depends(get_resume_service),
     settings: Settings = Depends(),
 ):
-    temp = _store_temp(file, settings)
+    temp = store_temp_file(file, settings)
     try:
         resume = service.upload(temp, file.filename, job_title)
         return resume.id
