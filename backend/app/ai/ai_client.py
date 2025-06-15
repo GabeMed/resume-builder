@@ -1,5 +1,6 @@
 from typing import Protocol
-import openai, textwrap
+import textwrap
+from openai import OpenAI
 from app.config import Settings
 
 
@@ -30,7 +31,7 @@ class OpenAIClient(IAIClient):
 
     def generate_feedback(self, resume_html: str, job_title: str) -> str:
         """
-        Generate feedback for a resume.
+        Generate feedback and the revised html for a resume.
         """
         prompt = textwrap.dedent(
             f"""You are an expert recruiter and career coach. Bellow deliminated by [[ ]] are the inputs:
@@ -57,7 +58,8 @@ class OpenAIClient(IAIClient):
                 <!DOCTYPE html> <html> <head> <!-- CSS to improve the resume for the target role --> </head> <body> <!-- Restyled resume content --> </body> </html> 
         """
         )
-        response = openai.ChatCompletion.create(
+        client = OpenAI(self.api_key)
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
         )
