@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import resume
+from app.routes.resume import router as resume_router
 
 app = FastAPI(title="Resume Builder API", description="API for Resume Builder")
 
@@ -12,4 +12,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(resume.router)
+app.include_router(resume_router)
