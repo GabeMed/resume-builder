@@ -1,6 +1,6 @@
 from typing import Dict, Protocol, Optional
 from sqlmodel import Session, select
-from models.resume import Resume
+from app.models.resume import Resume
 
 
 class IResumeRepository(Protocol):

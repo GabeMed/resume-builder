@@ -1,10 +1,10 @@
 import os
 from typing import Dict, Optional, Protocol
-from ai.ai_client import IAIClient
-from extractors.docling_extractor import extract_html_from_file
-from generators.pdf_weasy_generator import generate_pdf
-from models.resume import Resume
-from repositories.resume import IResumeRepository
+from app.ai.ai_client import IAIClient
+from app.extractors.docling_extractor import extract_html_from_file
+from app.generators.pdf_weasy_generator import generate_pdf
+from app.models.resume import Resume
+from app.repositories.resume import IResumeRepository
 from sqlmodel import Session
 
 

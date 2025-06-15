@@ -1,12 +1,12 @@
-from ai.ai_client import IAIClient
-from db.session import get_session
-from dependencies.ai import get_ai_client
-from dependencies.repositories import get_resume_repository
+from app.ai.ai_client import IAIClient
+from app.db.session import get_session
+from app.dependencies.ai import get_ai_client
+from app.dependencies.repositories import get_resume_repository
 from fastapi import Depends
-from repositories.resume import IResumeRepository
-from services.resume import IResumeService, ResumeService
+from app.repositories.resume import IResumeRepository
+from app.services.resume import IResumeService, ResumeService
 from sqlmodel import Session
-from config import Settings
+from app.config import Settings
 
 
 def get_resume_service(
