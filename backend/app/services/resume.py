@@ -16,7 +16,7 @@ class IResumeService(Protocol):
     def upload(self, file_path: str, original_filename: str, job_title: str) -> Resume:
         """
         Upload a new resume.
-        @param file_path: The path to the resume file.
+        @param file_path: The path to where the resume file will be saved.
         @param original_filename: The original filename of the resume.
         @param job_title: The job title the user is applying for.
         @return: The uploaded resume.
