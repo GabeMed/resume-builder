@@ -1,14 +1,14 @@
 from docling.document_converter import DocumentConverter
 import os
 
-_converter = DocumentConverter()
+converter = DocumentConverter()
 
 
 def extract_html_from_file(file_path: str) -> str:
     """
     Use Docling to convert the given file_path (PDF/DOCX/etc.) into an HTML string.
     """
-    result = _converter.convert(file_path)
+    result = converter.convert(file_path)
     html = result.document.export_to_html()
     return html
 
