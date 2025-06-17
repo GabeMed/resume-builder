@@ -4,7 +4,7 @@ from app.dependencies.ai import get_ai_client
 from app.dependencies.repositories import get_resume_repository
 from fastapi import Depends
 from app.repositories.resume import IResumeRepository
-from app.services.resume import IResumeService, ResumeService
+from app.services.resume import IResumeService, ResumeService, MockResumeService
 from sqlmodel import Session
 from app.config import Settings
 
@@ -22,3 +22,7 @@ def get_resume_service(
         settings.UPLOAD_DIR,
         settings.AI_OUTPUT_DIR,
     )
+
+
+def get_mock_resume_service() -> IResumeService:
+    return MockResumeService()

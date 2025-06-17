@@ -31,6 +31,32 @@ class IResumeService(Protocol):
         """
         ...
 
+    def create_initial(self, original_filename: str, job_title: str) -> Resume:
+        """
+        Create an initial resume entry in the database.
+        @param original_filename: The original filename of the resume
+        @param job_title: The job title the user is applying for
+        @return: The created resume
+        """
+        ...
+
+    def parse_ai_response(self, ai_response: str) -> Dict[str, str]:
+        """
+        Parse the AI response into feedback text and revised HTML.
+        @param ai_response: The raw AI response string
+        @return: Dictionary containing feedback_text and revised_html
+        """
+        ...
+
+    def make_pdf(self, revised_html: str, resume_id: int) -> str:
+        """
+        Generate a PDF from the revised HTML content.
+        @param revised_html: The HTML content to convert to PDF
+        @param resume_id: The ID of the resume
+        @return: Path to the generated PDF file
+        """
+        ...
+
 
 class ResumeService(IResumeService):
     """
@@ -57,11 +83,11 @@ class ResumeService(IResumeService):
         self.ai_output_dir = ai_output_dir
 
     def upload(self, file_path: str, original_filename: str, job_title: str) -> Resume:
-        resume = self.__create_initial(original_filename, job_title)
+        resume = self.create_initial(original_filename, job_title)
         resume_html = extract_html_from_file(file_path)
         ai_response = self.ai_client.generate_feedback(resume_html, job_title)
-        ai_response_dict = self.__parse_ai_response(ai_response)
-        result_pdf_path = self._make_pdf(ai_response_dict["revised_html"], resume.id)
+        ai_response_dict = self.parse_ai_response(ai_response)
+        result_pdf_path = self.make_pdf(ai_response_dict["revised_html"], resume.id)
         resume_new = Resume(
             resume_html=resume_html,
             feedback_text=ai_response_dict["feedback_text"],
@@ -72,14 +98,14 @@ class ResumeService(IResumeService):
         return resume_new
 
     def get_resume(self, id: int) -> Optional[Resume]:
-        self.resume_repository.get_by_id(id)
+        return self.resume_repository.get_by_id(id)
 
-    def __create_initial(self, original_filename: str, job_title: str) -> Resume:
+    def create_initial(self, original_filename: str, job_title: str) -> Resume:
         resume = Resume(original_filename=original_filename, job_title=job_title)
         self.resume_repository.create(resume)
         return resume
 
-    def __parse_ai_response(self, ai_response: str) -> Dict[str, str]:
+    def parse_ai_response(self, ai_response: str) -> Dict[str, str]:
         feedback_text = (
             ai_response.split("1)")[0].strip()
             if "1)" in ai_response
@@ -88,8 +114,30 @@ class ResumeService(IResumeService):
         revised_html = ai_response.split("2)")[1].strip() if "2)" in ai_response else ""
         return {"feedback_text": feedback_text, "revised_html": revised_html}
 
-    def _make_pdf(self, revised_html: str, resume_id: int) -> str:
+    def make_pdf(self, revised_html: str, resume_id: int) -> str:
         os.makedirs(self.ai_output_dir, exist_ok=True)
         output_path = os.path.join(self.ai_output_dir, f"{resume_id}_revised.pdf")
         generate_pdf(revised_html, output_path)
         return output_path
+
+
+class MockResumeService(IResumeService):
+    """
+    Mock implementation of the resume service.
+    """
+
+    def upload(self, job_title: str) -> Resume:
+        return Resume(
+            id=1,
+            feedback_text="mock_feedback",
+            revised_html="mock_html",
+            job_title=job_title,
+        )
+
+    def get_resume(self, id: int) -> Optional[Resume]:
+        return Resume(
+            id=id,
+            feedback_text="mock_feedback",
+            revised_html="mock_html",
+            job_title="mock_job_title",
+        )
