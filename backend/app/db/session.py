@@ -1,10 +1,5 @@
-from sqlmodel import create_engine, Session
-from app.config import Settings
+from sqlmodel import create_engine
+from app.dependencies.settings import get_settings
 
-settings = Settings()
+settings = get_settings()
 engine = create_engine(settings.DATABASE_URL, echo=True)
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
