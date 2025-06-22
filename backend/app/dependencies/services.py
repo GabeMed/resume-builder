@@ -1,19 +1,17 @@
-from app.ai.ai_client import IAIClient
-from app.db.session import get_session
-from app.dependencies.ai import get_ai_client
-from app.dependencies.repositories import get_resume_repository
+from typing import Annotated
+from app.dependencies.database import SessionDep
+from app.dependencies.ai import AIClientDep
+from app.dependencies.repositories import ResumeRepositoryDep
 from fastapi import Depends
-from app.repositories.resume import IResumeRepository
 from app.services.resume import IResumeService, ResumeService, MockResumeService
-from sqlmodel import Session
-from app.config import Settings
+from app.dependencies.settings import SettingsDep
 
 
 def get_resume_service(
-    repo: IResumeRepository = Depends(get_resume_repository),
-    session: Session = Depends(get_session),
-    ai: IAIClient = Depends(get_ai_client),
-    settings: Settings = Depends(),
+    repo: ResumeRepositoryDep,
+    session: SessionDep,
+    ai: AIClientDep,
+    settings: SettingsDep,
 ) -> IResumeService:
     return ResumeService(
         repo,
@@ -26,3 +24,6 @@ def get_resume_service(
 
 def get_mock_resume_service() -> IResumeService:
     return MockResumeService()
+
+
+ResumeServiceDep = Annotated[IResumeService, Depends(get_resume_service)]
