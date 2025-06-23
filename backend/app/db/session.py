@@ -1,5 +1,5 @@
 from sqlmodel import create_engine
-from app.dependencies.settings import get_settings
+from app.dependencies.settings import SettingsDep
 
-settings = get_settings()
+settings = SettingsDep()
 engine = create_engine(settings.DATABASE_URL, echo=True)
