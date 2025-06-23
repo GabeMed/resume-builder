@@ -17,7 +17,7 @@ class Resume(SQLModel, table=True):
     """
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     original_filename: str
     job_title: Optional[str] = None
     resume_html: Optional[str] = None
