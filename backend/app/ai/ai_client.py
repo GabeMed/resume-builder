@@ -1,7 +1,7 @@
 from typing import Protocol
 import textwrap
-from openai import OpenAI
 from app.config import Settings
+import openai
 
 
 class IAIClient(Protocol):
@@ -27,27 +27,31 @@ class OpenAIClient(IAIClient):
     """
 
     def __init__(self, settings: Settings):
-        self.api_key = settings.OPENAI_API_KEY
+        openai.api_key = settings.OPENAI_API_KEY
 
     def generate_feedback(self, resume_html: str, job_title: str) -> str:
         """
         Generate feedback and the revised html for a resume.
         """
         prompt = textwrap.dedent(
-            f"""You are an expert recruiter and career coach. Bellow deliminated by [[ ]] are the inputs:
+            f"""You are an expert recruiter and career coach. Below are the inputs:
                 - [[{resume_html}]]: the candidate's current resume in raw HTML form.
                 - [[{job_title}]]: the role the candidate is applying for.
 
                 Generate exactly two sections in your output:
 
                 1) **Analysis and Feedback**  
-                - Critique the resume structure, content, and formatting relative to role.  
+                - Critique the resume structure, content, and formatting relative to the target role.  
                 - Identify strengths and areas for improvement (e.g., missing keywords, weak bullets, layout issues).  
                 - Provide specific, actionable suggestions to optimize each section (summary, experience, skills, education) for the target role and ATS.
 
                 2) **RevisedResumeHTML**  
-                - Produce a complete HTML document (including `<head>` and CSS) that preserves the original content hierarchy but restyles everything to improve the resume for the target role, keep it simple basic and functional.  
-                - Do not include any explanation only the updated HTML.  
+                - Create a complete, professional HTML resume document that includes ALL the candidate's information from the original resume.
+                - Improve the content, structure, and formatting to better match the target role requirements.
+                - Include proper CSS styling in the <head> section for a clean, professional appearance.
+                - Preserve all relevant information but enhance it for the target role.
+                - Make sure the HTML is complete and functional - include all sections, content, and proper styling.
+                - Do not include any explanations or comments outside the HTML structure.
 
                 Output format (no extra text):
 
@@ -55,11 +59,21 @@ class OpenAIClient(IAIClient):
                 <detailed analysis and feedback>
 
                 2)
-                <!DOCTYPE html> <html> <head> <!-- CSS to improve the resume for the target role --> </head> <body> <!-- Restyled resume content --> </body> </html> 
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Professional Resume</title>
+                    <style>
+                        /* Professional CSS styling for the resume */
+                    </style>
+                </head>
+                <body>
+                    <!-- Complete revised resume content with all sections -->
+                </body>
+                </html>
         """
         )
-        client = OpenAI(self.api_key)
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
         )
