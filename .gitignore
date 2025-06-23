@@ -48,3 +48,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+## Local File Management ##
+
+ai_outputs/
+uploaded_resumes/

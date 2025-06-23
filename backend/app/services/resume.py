@@ -106,12 +106,15 @@ class ResumeService(IResumeService):
         return resume
 
     def parse_ai_response(self, ai_response: str) -> Dict[str, str]:
-        feedback_text = (
-            ai_response.split("1)")[0].strip()
-            if "1)" in ai_response
-            else ai_response.strip()
-        )
-        revised_html = ai_response.split("2)")[1].strip() if "2)" in ai_response else ""
+        parts = ai_response.split("1)")
+        if len(parts) < 2:
+            return {"feedback_text": ai_response.strip(), "revised_html": ""}
+        after_1 = parts[1]
+        feedback_parts = after_1.split("2)")
+        if len(feedback_parts) < 2:
+            return {"feedback_text": after_1.strip(), "revised_html": ""}
+        feedback_text = feedback_parts[0].strip()
+        revised_html = feedback_parts[1].strip()
         return {"feedback_text": feedback_text, "revised_html": revised_html}
 
     def make_pdf(self, revised_html: str, resume_id: int) -> str:
